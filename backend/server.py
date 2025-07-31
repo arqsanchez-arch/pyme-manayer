@@ -26,7 +26,150 @@ app = FastAPI()
 api_router = APIRouter(prefix="/api")
 
 
-# Define Models
+# Define Models for PYME Management System
+
+# Cliente Model
+class Cliente(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    nombre: str
+    email: str
+    telefono: str = ""
+    direccion: str = ""
+    cuit_dni: str = ""
+    fecha_creacion: datetime = Field(default_factory=datetime.utcnow)
+
+class ClienteCreate(BaseModel):
+    nombre: str
+    email: str
+    telefono: str = ""
+    direccion: str = ""
+    cuit_dni: str = ""
+
+class ClienteUpdate(BaseModel):
+    nombre: str = None
+    email: str = None
+    telefono: str = None
+    direccion: str = None
+    cuit_dni: str = None
+
+# Pedido Model
+class ItemPedido(BaseModel):
+    descripcion: str
+    cantidad: int
+    precio_unitario: float
+    subtotal: float
+
+class Pedido(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    numero_pedido: str
+    cliente_id: str
+    cliente_nombre: str = ""
+    items: List[ItemPedido]
+    total: float
+    estado: str = "pendiente"  # pendiente, en_proceso, completado, cancelado
+    fecha_pedido: datetime = Field(default_factory=datetime.utcnow)
+    fecha_entrega: datetime = None
+    notas: str = ""
+
+class PedidoCreate(BaseModel):
+    numero_pedido: str
+    cliente_id: str
+    items: List[ItemPedido]
+    fecha_entrega: datetime = None
+    notas: str = ""
+
+# Factura Model
+class Factura(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    numero_factura: str
+    pedido_id: str = None
+    cliente_id: str
+    cliente_nombre: str = ""
+    items: List[ItemPedido]
+    subtotal: float
+    impuestos: float
+    total: float
+    estado: str = "pendiente"  # pendiente, pagada, vencida
+    fecha_emision: datetime = Field(default_factory=datetime.utcnow)
+    fecha_vencimiento: datetime
+    fecha_pago: datetime = None
+    notas: str = ""
+
+class FacturaCreate(BaseModel):
+    numero_factura: str
+    pedido_id: str = None
+    cliente_id: str
+    items: List[ItemPedido]
+    impuestos: float = 0.0
+    fecha_vencimiento: datetime
+    notas: str = ""
+
+# Compra Model
+class ItemCompra(BaseModel):
+    descripcion: str
+    cantidad: int = 1
+    precio_unitario: float
+    subtotal: float
+
+class Compra(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    numero_compra: str
+    proveedor: str
+    categoria: str = "general"  # general, materiales, servicios, gastos
+    items: List[ItemCompra]
+    subtotal: float
+    impuestos: float
+    total: float
+    fecha_compra: datetime = Field(default_factory=datetime.utcnow)
+    fecha_pago: datetime = None
+    estado_pago: str = "pendiente"  # pendiente, pagado
+    notas: str = ""
+
+class CompraCreate(BaseModel):
+    numero_compra: str
+    proveedor: str
+    categoria: str = "general"
+    items: List[ItemCompra]
+    impuestos: float = 0.0
+    fecha_pago: datetime = None
+    estado_pago: str = "pendiente"
+    notas: str = ""
+
+# Remito Model
+class Remito(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    numero_remito: str
+    pedido_id: str
+    factura_id: str = None
+    cliente_id: str
+    cliente_nombre: str = ""
+    items: List[ItemPedido]
+    transportista: str = ""
+    fecha_emision: datetime = Field(default_factory=datetime.utcnow)
+    fecha_entrega: datetime = None
+    estado: str = "pendiente"  # pendiente, en_transito, entregado
+    notas: str = ""
+
+class RemitoCreate(BaseModel):
+    numero_remito: str
+    pedido_id: str
+    factura_id: str = None
+    cliente_id: str
+    items: List[ItemPedido]
+    transportista: str = ""
+    fecha_entrega: datetime = None
+    notas: str = ""
+
+# Dashboard Model
+class DashboardData(BaseModel):
+    total_ventas: float
+    total_gastos: float
+    ganancia_neta: float
+    pedidos_pendientes: int
+    facturas_pendientes: int
+    facturas_vencidas: int
+
+# Legacy model (keep for existing functionality)
 class StatusCheck(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     client_name: str
