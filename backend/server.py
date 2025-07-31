@@ -178,10 +178,237 @@ class StatusCheck(BaseModel):
 class StatusCheckCreate(BaseModel):
     client_name: str
 
-# Add your routes to the router instead of directly to app
+# CRUD Endpoints for Clientes
+@api_router.post("/clientes", response_model=Cliente)
+async def create_cliente(cliente: ClienteCreate):
+    cliente_dict = cliente.dict()
+    cliente_obj = Cliente(**cliente_dict)
+    await db.clientes.insert_one(cliente_obj.dict())
+    return cliente_obj
+
+@api_router.get("/clientes", response_model=List[Cliente])
+async def get_clientes():
+    clientes = await db.clientes.find().to_list(1000)
+    return [Cliente(**cliente) for cliente in clientes]
+
+@api_router.get("/clientes/{cliente_id}", response_model=Cliente)
+async def get_cliente(cliente_id: str):
+    cliente = await db.clientes.find_one({"id": cliente_id})
+    if not cliente:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Cliente not found")
+    return Cliente(**cliente)
+
+@api_router.put("/clientes/{cliente_id}", response_model=Cliente)
+async def update_cliente(cliente_id: str, cliente_update: ClienteUpdate):
+    update_data = {k: v for k, v in cliente_update.dict().items() if v is not None}
+    if not update_data:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=400, detail="No data to update")
+    
+    result = await db.clientes.update_one({"id": cliente_id}, {"$set": update_data})
+    if result.matched_count == 0:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Cliente not found")
+    
+    updated_cliente = await db.clientes.find_one({"id": cliente_id})
+    return Cliente(**updated_cliente)
+
+@api_router.delete("/clientes/{cliente_id}")
+async def delete_cliente(cliente_id: str):
+    result = await db.clientes.delete_one({"id": cliente_id})
+    if result.deleted_count == 0:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Cliente not found")
+    return {"message": "Cliente deleted successfully"}
+
+# CRUD Endpoints for Pedidos
+@api_router.post("/pedidos", response_model=Pedido)
+async def create_pedido(pedido: PedidoCreate):
+    # Get client name
+    cliente = await db.clientes.find_one({"id": pedido.cliente_id})
+    cliente_nombre = cliente["nombre"] if cliente else ""
+    
+    # Calculate total
+    total = sum(item.subtotal for item in pedido.items)
+    
+    pedido_dict = pedido.dict()
+    pedido_dict["cliente_nombre"] = cliente_nombre
+    pedido_dict["total"] = total
+    pedido_obj = Pedido(**pedido_dict)
+    await db.pedidos.insert_one(pedido_obj.dict())
+    return pedido_obj
+
+@api_router.get("/pedidos", response_model=List[Pedido])
+async def get_pedidos():
+    pedidos = await db.pedidos.find().to_list(1000)
+    return [Pedido(**pedido) for pedido in pedidos]
+
+@api_router.get("/pedidos/{pedido_id}", response_model=Pedido)
+async def get_pedido(pedido_id: str):
+    pedido = await db.pedidos.find_one({"id": pedido_id})
+    if not pedido:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Pedido not found")
+    return Pedido(**pedido)
+
+@api_router.put("/pedidos/{pedido_id}/estado")
+async def update_pedido_estado(pedido_id: str, estado: str):
+    valid_estados = ["pendiente", "en_proceso", "completado", "cancelado"]
+    if estado not in valid_estados:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=400, detail="Invalid estado")
+    
+    result = await db.pedidos.update_one({"id": pedido_id}, {"$set": {"estado": estado}})
+    if result.matched_count == 0:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Pedido not found")
+    return {"message": f"Pedido estado updated to {estado}"}
+
+# CRUD Endpoints for Facturas
+@api_router.post("/facturas", response_model=Factura)
+async def create_factura(factura: FacturaCreate):
+    # Get client name
+    cliente = await db.clientes.find_one({"id": factura.cliente_id})
+    cliente_nombre = cliente["nombre"] if cliente else ""
+    
+    # Calculate totals
+    subtotal = sum(item.subtotal for item in factura.items)
+    total = subtotal + factura.impuestos
+    
+    factura_dict = factura.dict()
+    factura_dict["cliente_nombre"] = cliente_nombre
+    factura_dict["subtotal"] = subtotal
+    factura_dict["total"] = total
+    factura_obj = Factura(**factura_dict)
+    await db.facturas.insert_one(factura_obj.dict())
+    return factura_obj
+
+@api_router.get("/facturas", response_model=List[Factura])
+async def get_facturas():
+    facturas = await db.facturas.find().to_list(1000)
+    return [Factura(**factura) for factura in facturas]
+
+@api_router.get("/facturas/{factura_id}", response_model=Factura)
+async def get_factura(factura_id: str):
+    factura = await db.facturas.find_one({"id": factura_id})
+    if not factura:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Factura not found")
+    return Factura(**factura)
+
+@api_router.put("/facturas/{factura_id}/pagar")
+async def marcar_factura_pagada(factura_id: str):
+    result = await db.facturas.update_one(
+        {"id": factura_id}, 
+        {"$set": {"estado": "pagada", "fecha_pago": datetime.utcnow()}}
+    )
+    if result.matched_count == 0:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Factura not found")
+    return {"message": "Factura marked as paid"}
+
+# CRUD Endpoints for Compras
+@api_router.post("/compras", response_model=Compra)
+async def create_compra(compra: CompraCreate):
+    # Calculate totals
+    subtotal = sum(item.subtotal for item in compra.items)
+    total = subtotal + compra.impuestos
+    
+    compra_dict = compra.dict()
+    compra_dict["subtotal"] = subtotal
+    compra_dict["total"] = total
+    compra_obj = Compra(**compra_dict)
+    await db.compras.insert_one(compra_obj.dict())
+    return compra_obj
+
+@api_router.get("/compras", response_model=List[Compra])
+async def get_compras():
+    compras = await db.compras.find().to_list(1000)
+    return [Compra(**compra) for compra in compras]
+
+@api_router.get("/compras/{compra_id}", response_model=Compra)
+async def get_compra(compra_id: str):
+    compra = await db.compras.find_one({"id": compra_id})
+    if not compra:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Compra not found")
+    return Compra(**compra)
+
+# CRUD Endpoints for Remitos
+@api_router.post("/remitos", response_model=Remito)
+async def create_remito(remito: RemitoCreate):
+    # Get client name
+    cliente = await db.clientes.find_one({"id": remito.cliente_id})
+    cliente_nombre = cliente["nombre"] if cliente else ""
+    
+    remito_dict = remito.dict()
+    remito_dict["cliente_nombre"] = cliente_nombre
+    remito_obj = Remito(**remito_dict)
+    await db.remitos.insert_one(remito_obj.dict())
+    return remito_obj
+
+@api_router.get("/remitos", response_model=List[Remito])
+async def get_remitos():
+    remitos = await db.remitos.find().to_list(1000)
+    return [Remito(**remito) for remito in remitos]
+
+@api_router.get("/remitos/{remito_id}", response_model=Remito)
+async def get_remito(remito_id: str):
+    remito = await db.remitos.find_one({"id": remito_id})
+    if not remito:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Remito not found")
+    return Remito(**remito)
+
+@api_router.put("/remitos/{remito_id}/estado")
+async def update_remito_estado(remito_id: str, estado: str):
+    valid_estados = ["pendiente", "en_transito", "entregado"]
+    if estado not in valid_estados:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=400, detail="Invalid estado")
+    
+    result = await db.remitos.update_one({"id": remito_id}, {"$set": {"estado": estado}})
+    if result.matched_count == 0:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Remito not found")
+    return {"message": f"Remito estado updated to {estado}"}
+
+# Dashboard Endpoint
+@api_router.get("/dashboard", response_model=DashboardData)
+async def get_dashboard_data():
+    # Calculate total sales from paid invoices
+    facturas_pagadas = await db.facturas.find({"estado": "pagada"}).to_list(1000)
+    total_ventas = sum(factura["total"] for factura in facturas_pagadas)
+    
+    # Calculate total expenses from purchases
+    compras = await db.compras.find().to_list(1000)
+    total_gastos = sum(compra["total"] for compra in compras)
+    
+    # Calculate net profit
+    ganancia_neta = total_ventas - total_gastos
+    
+    # Count pending orders and invoices
+    pedidos_pendientes = await db.pedidos.count_documents({"estado": "pendiente"})
+    facturas_pendientes = await db.facturas.count_documents({"estado": "pendiente"})
+    facturas_vencidas = await db.facturas.count_documents({
+        "estado": "pendiente",
+        "fecha_vencimiento": {"$lt": datetime.utcnow()}
+    })
+    
+    return DashboardData(
+        total_ventas=total_ventas,
+        total_gastos=total_gastos,
+        ganancia_neta=ganancia_neta,
+        pedidos_pendientes=pedidos_pendientes,
+        facturas_pendientes=facturas_pendientes,
+        facturas_vencidas=facturas_vencidas
+    )
+
+# Legacy endpoints (keep for existing functionality)
 @api_router.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "PYME Management API"}
 
 @api_router.post("/status", response_model=StatusCheck)
 async def create_status_check(input: StatusCheckCreate):
