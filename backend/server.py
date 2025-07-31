@@ -92,7 +92,7 @@ class Factura(BaseModel):
     estado: str = "pendiente"  # pendiente, pagada, vencida
     fecha_emision: datetime = Field(default_factory=datetime.utcnow)
     fecha_vencimiento: datetime
-    fecha_pago: datetime = None
+    fecha_pago: Optional[datetime] = None
     notas: str = ""
 
 class FacturaCreate(BaseModel):
