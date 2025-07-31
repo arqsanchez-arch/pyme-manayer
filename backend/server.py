@@ -157,7 +157,7 @@ class RemitoCreate(BaseModel):
     cliente_id: str
     items: List[ItemPedido]
     transportista: str = ""
-    fecha_entrega: datetime = None
+    fecha_entrega: Optional[datetime] = None
     notas: str = ""
 
 # Dashboard Model
