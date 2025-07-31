@@ -101,3 +101,182 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: "Desarrollo de aplicación de gestión PYME con manejo de pedidos, facturas, compras, remitos y control financiero. Sin control de inventario."
+
+backend:
+  - task: "Implementar modelos de datos base"
+    implemented: false
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Iniciando implementación de modelos Clientes, Pedidos, Facturas, Compras, Remitos"
+
+  - task: "API endpoints CRUD para Clientes"
+    implemented: false
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Pendiente implementación"
+
+  - task: "API endpoints CRUD para Pedidos"
+    implemented: false
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Pendiente implementación"
+
+  - task: "API endpoints CRUD para Facturas"
+    implemented: false
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Pendiente implementación"
+
+  - task: "API endpoints CRUD para Compras"
+    implemented: false
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Pendiente implementación"
+
+  - task: "API endpoints CRUD para Remitos"
+    implemented: false
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Pendiente implementación"
+
+  - task: "API endpoint dashboard financiero"
+    implemented: false
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Pendiente implementación"
+
+frontend:
+  - task: "Layout principal y navegación"
+    implemented: false
+    working: "NA"
+    file: "App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Pendiente implementación del layout con Shadcn UI"
+
+  - task: "Formularios de gestión de Clientes"
+    implemented: false
+    working: "NA"
+    file: "components/Clientes.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Pendiente implementación"
+
+  - task: "Formularios de gestión de Pedidos"
+    implemented: false
+    working: "NA"
+    file: "components/Pedidos.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Pendiente implementación"
+
+  - task: "Formularios de gestión de Facturas"
+    implemented: false
+    working: "NA"
+    file: "components/Facturas.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Pendiente implementación"
+
+  - task: "Formularios de gestión de Compras"
+    implemented: false
+    working: "NA"
+    file: "components/Compras.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Pendiente implementación"
+
+  - task: "Dashboard financiero con gráficos"
+    implemented: false
+    working: "NA"
+    file: "components/Dashboard.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Pendiente implementación con recharts"
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 0
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "Implementar modelos de datos base"
+    - "API endpoints CRUD para Clientes"
+    - "Layout principal y navegación"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: "Iniciando desarrollo PYME. Plan establecido con modelos de datos y endpoints API como prioridad inicial."
