@@ -121,7 +121,7 @@ class Compra(BaseModel):
     impuestos: float
     total: float
     fecha_compra: datetime = Field(default_factory=datetime.utcnow)
-    fecha_pago: datetime = None
+    fecha_pago: Optional[datetime] = None
     estado_pago: str = "pendiente"  # pendiente, pagado
     notas: str = ""
 
