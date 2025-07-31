@@ -131,7 +131,7 @@ class CompraCreate(BaseModel):
     categoria: str = "general"
     items: List[ItemCompra]
     impuestos: float = 0.0
-    fecha_pago: datetime = None
+    fecha_pago: Optional[datetime] = None
     estado_pago: str = "pendiente"
     notas: str = ""
 
