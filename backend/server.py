@@ -146,7 +146,7 @@ class Remito(BaseModel):
     items: List[ItemPedido]
     transportista: str = ""
     fecha_emision: datetime = Field(default_factory=datetime.utcnow)
-    fecha_entrega: datetime = None
+    fecha_entrega: Optional[datetime] = None
     estado: str = "pendiente"  # pendiente, en_transito, entregado
     notas: str = ""
 
