@@ -270,13 +270,16 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Implementar modelos de datos base"
     - "API endpoints CRUD para Clientes"
-    - "Layout principal y navegación"
+    - "API endpoints CRUD para Pedidos"  
+    - "API endpoints CRUD para Facturas"
+    - "API endpoints CRUD para Compras"
+    - "API endpoints CRUD para Remitos"
+    - "API endpoint dashboard financiero"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
 agent_communication:
   - agent: "main"
-    message: "Iniciando desarrollo PYME. Plan establecido con modelos de datos y endpoints API como prioridad inicial."
+    message: "Backend completado: todos los modelos de datos y 25+ endpoints API implementados. Listos para testing del backend antes de proceder con frontend."
