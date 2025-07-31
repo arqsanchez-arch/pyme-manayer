@@ -153,7 +153,7 @@ class Remito(BaseModel):
 class RemitoCreate(BaseModel):
     numero_remito: str
     pedido_id: str
-    factura_id: str = None
+    factura_id: Optional[str] = None
     cliente_id: str
     items: List[ItemPedido]
     transportista: str = ""
