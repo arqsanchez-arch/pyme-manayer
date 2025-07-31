@@ -75,7 +75,7 @@ class PedidoCreate(BaseModel):
     numero_pedido: str
     cliente_id: str
     items: List[ItemPedido]
-    fecha_entrega: datetime = None
+    fecha_entrega: Optional[datetime] = None
     notas: str = ""
 
 # Factura Model
