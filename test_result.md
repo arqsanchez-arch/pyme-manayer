@@ -106,88 +106,88 @@ user_problem_statement: "Desarrollo de aplicación de gestión PYME con manejo d
 
 backend:
   - task: "Implementar modelos de datos base"
-    implemented: false
+    implemented: true
     working: "NA"
     file: "server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "Iniciando implementación de modelos Clientes, Pedidos, Facturas, Compras, Remitos"
+        comment: "Implementados todos los modelos: Cliente, Pedido, Factura, Compra, Remito con validaciones Pydantic"
 
   - task: "API endpoints CRUD para Clientes"
-    implemented: false
+    implemented: true
     working: "NA"
     file: "server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "Pendiente implementación"
+        comment: "Implementados endpoints CRUD completos para gestión de clientes"
 
   - task: "API endpoints CRUD para Pedidos"
-    implemented: false
+    implemented: true
     working: "NA"
     file: "server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "Pendiente implementación"
+        comment: "Implementados endpoints CRUD para pedidos con cálculo automático de totales"
 
   - task: "API endpoints CRUD para Facturas"
-    implemented: false
+    implemented: true
     working: "NA"
     file: "server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "Pendiente implementación"
+        comment: "Implementados endpoints para facturas con funcionalidad de marcar como pagada"
 
   - task: "API endpoints CRUD para Compras"
-    implemented: false
+    implemented: true
     working: "NA"
     file: "server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "Pendiente implementación"
+        comment: "Implementados endpoints para gestión de compras y gastos"
 
   - task: "API endpoints CRUD para Remitos"
-    implemented: false
+    implemented: true
     working: "NA"
     file: "server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "Pendiente implementación"
+        comment: "Implementados endpoints para remitos con gestión de estados"
 
   - task: "API endpoint dashboard financiero"
-    implemented: false
+    implemented: true
     working: "NA"
     file: "server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "Pendiente implementación"
+        comment: "Implementado endpoint dashboard con cálculos financieros automáticos"
 
 frontend:
   - task: "Layout principal y navegación"
