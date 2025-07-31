@@ -97,7 +97,7 @@ class Factura(BaseModel):
 
 class FacturaCreate(BaseModel):
     numero_factura: str
-    pedido_id: str = None
+    pedido_id: Optional[str] = None
     cliente_id: str
     items: List[ItemPedido]
     impuestos: float = 0.0
