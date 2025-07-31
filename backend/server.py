@@ -82,7 +82,7 @@ class PedidoCreate(BaseModel):
 class Factura(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     numero_factura: str
-    pedido_id: str = None
+    pedido_id: Optional[str] = None
     cliente_id: str
     cliente_nombre: str = ""
     items: List[ItemPedido]
