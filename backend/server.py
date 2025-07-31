@@ -68,7 +68,7 @@ class Pedido(BaseModel):
     total: float
     estado: str = "pendiente"  # pendiente, en_proceso, completado, cancelado
     fecha_pedido: datetime = Field(default_factory=datetime.utcnow)
-    fecha_entrega: datetime = None
+    fecha_entrega: Optional[datetime] = None
     notas: str = ""
 
 class PedidoCreate(BaseModel):
