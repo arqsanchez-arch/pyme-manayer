@@ -325,13 +325,17 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "API endpoints CRUD para Articulos"
+    - "Formularios de gestión de Artículos"
+    - "Layout principal y navegación"
+    - "Dashboard financiero con gráficos"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
 agent_communication:
   - agent: "main"
-    message: "Backend completado: todos los modelos de datos y 25+ endpoints API implementados. Listos para testing del backend antes de proceder con frontend."
+    message: "Sistema completo implementado: Backend con todos los endpoints + Frontend completo con navegación, formularios y dashboard. Agregado módulo de Artículos para catálogo. Listos para testing completo."
   - agent: "testing"
     message: "✅ BACKEND TESTING COMPLETE: All 6 backend tasks tested and working perfectly! Success rate: 88.5% (23/26 tests passed). Fixed critical issues with Optional datetime fields (fecha_pago, fecha_entrega) and Optional string fields (pedido_id, factura_id). All CRUD operations working, calculations correct, error handling proper. Complete business workflow tested: Cliente → Pedido → Factura → Payment → Remito. Dashboard financial calculations verified. Backend is production-ready. Only minor test assertion issues remain (error handling actually works correctly). Ready for frontend development."
