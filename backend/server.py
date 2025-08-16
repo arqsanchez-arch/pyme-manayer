@@ -28,6 +28,36 @@ api_router = APIRouter(prefix="/api")
 
 # Define Models for PYME Management System
 
+# Articulo Model
+class Articulo(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    codigo: str = ""
+    nombre: str
+    descripcion: str = ""
+    precio: float
+    categoria: str = "general"  # general, producto, servicio
+    unidad_medida: str = "unidad"  # unidad, kg, m, litro, etc.
+    activo: bool = True
+    fecha_creacion: datetime = Field(default_factory=datetime.utcnow)
+
+class ArticuloCreate(BaseModel):
+    codigo: str = ""
+    nombre: str
+    descripcion: str = ""
+    precio: float
+    categoria: str = "general"
+    unidad_medida: str = "unidad"
+    activo: bool = True
+
+class ArticuloUpdate(BaseModel):
+    codigo: str = None
+    nombre: str = None
+    descripcion: str = None
+    precio: float = None
+    categoria: str = None
+    unidad_medida: str = None
+    activo: bool = None
+
 # Cliente Model
 class Cliente(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
