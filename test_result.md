@@ -115,7 +115,7 @@ backend:
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "Implementados todos los modelos: Cliente, Pedido, Factura, Compra, Remito con validaciones Pydantic"
+        comment: "Implementados todos los modelos: Cliente, Pedido, Factura, Compra, Remito, Articulo con validaciones Pydantic"
       - working: true
         agent: "testing"
         comment: "✅ TESTED: All data models working correctly with proper Pydantic validation. Fixed Optional datetime fields for fecha_pago, fecha_entrega, pedido_id, factura_id. All models create and serialize properly."
