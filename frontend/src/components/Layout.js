@@ -17,6 +17,7 @@ const Layout = ({ children }) => {
 
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+    { name: 'Artículos', href: '/articulos', icon: Package },
     { name: 'Clientes', href: '/clientes', icon: Users },
     { name: 'Pedidos', href: '/pedidos', icon: ShoppingCart },
     { name: 'Facturas', href: '/facturas', icon: FileText },
