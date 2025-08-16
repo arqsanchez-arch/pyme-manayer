@@ -120,6 +120,17 @@ backend:
         agent: "testing"
         comment: "✅ TESTED: All data models working correctly with proper Pydantic validation. Fixed Optional datetime fields for fecha_pago, fecha_entrega, pedido_id, factura_id. All models create and serialize properly."
 
+  - task: "API endpoints CRUD para Articulos"
+    implemented: true
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implementados endpoints CRUD completos para gestión de catálogo de artículos"
   - task: "API endpoints CRUD para Clientes"
     implemented: true
     working: true
