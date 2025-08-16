@@ -223,76 +223,100 @@ backend:
 
 frontend:
   - task: "Layout principal y navegación"
-    implemented: false
+    implemented: true
     working: "NA"
     file: "App.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "Pendiente implementación del layout con Shadcn UI"
+        comment: "Implementado layout responsive con navegación Shadcn UI y rutas para todos los módulos incluyendo Artículos"
+
+  - task: "Formularios de gestión de Artículos"
+    implemented: true
+    working: "NA"
+    file: "components/Articulos.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implementado catálogo completo de artículos con CRUD, filtros, búsqueda y gestión de estados"
 
   - task: "Formularios de gestión de Clientes"
-    implemented: false
+    implemented: true
     working: "NA"
     file: "components/Clientes.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "Pendiente implementación"
+        comment: "Implementado formulario completo con validaciones y vista de tarjetas"
 
   - task: "Formularios de gestión de Pedidos"
-    implemented: false
+    implemented: true
     working: "NA"
     file: "components/Pedidos.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "Pendiente implementación"
+        comment: "Implementado con gestión de items, cálculo automático de totales y gestión de estados"
 
   - task: "Formularios de gestión de Facturas"
-    implemented: false
+    implemented: true
     working: "NA"
     file: "components/Facturas.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "Pendiente implementación"
+        comment: "Implementado con vinculación a pedidos, cálculo de impuestos y gestión de pagos"
 
   - task: "Formularios de gestión de Compras"
-    implemented: false
+    implemented: true
     working: "NA"
     file: "components/Compras.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "Pendiente implementación"
+        comment: "Implementado sistema completo de compras y gastos con categorización"
+
+  - task: "Formularios de gestión de Remitos"
+    implemented: true
+    working: "NA"
+    file: "components/Remitos.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implementado con vinculación a pedidos/facturas y gestión de entregas"
 
   - task: "Dashboard financiero con gráficos"
-    implemented: false
+    implemented: true
     working: "NA"
     file: "components/Dashboard.js"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "Pendiente implementación con recharts"
+        comment: "Implementado dashboard completo con recharts, métricas financieras y KPIs"
 
 metadata:
   created_by: "main_agent"
