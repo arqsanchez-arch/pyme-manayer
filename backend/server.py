@@ -208,6 +208,57 @@ class StatusCheck(BaseModel):
 class StatusCheckCreate(BaseModel):
     client_name: str
 
+# CRUD Endpoints for Articulos
+@api_router.post("/articulos", response_model=Articulo)
+async def create_articulo(articulo: ArticuloCreate):
+    articulo_dict = articulo.dict()
+    articulo_obj = Articulo(**articulo_dict)
+    await db.articulos.insert_one(articulo_obj.dict())
+    return articulo_obj
+
+@api_router.get("/articulos", response_model=List[Articulo])
+async def get_articulos(activos_only: bool = True):
+    filter_query = {"activo": True} if activos_only else {}
+    articulos = await db.articulos.find(filter_query).to_list(1000)
+    return [Articulo(**articulo) for articulo in articulos]
+
+@api_router.get("/articulos/{articulo_id}", response_model=Articulo)
+async def get_articulo(articulo_id: str):
+    articulo = await db.articulos.find_one({"id": articulo_id})
+    if not articulo:
+        raise HTTPException(status_code=404, detail="Articulo not found")
+    return Articulo(**articulo)
+
+@api_router.put("/articulos/{articulo_id}", response_model=Articulo)
+async def update_articulo(articulo_id: str, articulo_update: ArticuloUpdate):
+    update_data = {k: v for k, v in articulo_update.dict().items() if v is not None}
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No data to update")
+    
+    result = await db.articulos.update_one({"id": articulo_id}, {"$set": update_data})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Articulo not found")
+    
+    updated_articulo = await db.articulos.find_one({"id": articulo_id})
+    return Articulo(**updated_articulo)
+
+@api_router.delete("/articulos/{articulo_id}")
+async def delete_articulo(articulo_id: str):
+    result = await db.articulos.delete_one({"id": articulo_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Articulo not found")
+    return {"message": "Articulo deleted successfully"}
+
+@api_router.put("/articulos/{articulo_id}/toggle")
+async def toggle_articulo_activo(articulo_id: str):
+    articulo = await db.articulos.find_one({"id": articulo_id})
+    if not articulo:
+        raise HTTPException(status_code=404, detail="Articulo not found")
+    
+    new_status = not articulo.get("activo", True)
+    await db.articulos.update_one({"id": articulo_id}, {"$set": {"activo": new_status}})
+    return {"message": f"Articulo {'activated' if new_status else 'deactivated'}"}
+
 # CRUD Endpoints for Clientes
 @api_router.post("/clientes", response_model=Cliente)
 async def create_cliente(cliente: ClienteCreate):
