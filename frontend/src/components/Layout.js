@@ -7,6 +7,7 @@ import {
   FileText, 
   CreditCard, 
   Truck,
+  Package,
   Menu,
   X
 } from "lucide-react";
