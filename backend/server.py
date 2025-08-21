@@ -228,27 +228,39 @@ class ReciboCreate(BaseModel):
 class Factura(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     numero_factura: str
+    tipo_factura: str = "A"  # A, B, C
     pedido_id: Optional[str] = None
     cliente_id: str
     cliente_nombre: str = ""
+    cliente_direccion: str = ""
+    cliente_email: str = ""
+    cliente_telefono: str = ""
+    cliente_cuit: str = ""
+    condicion_iva: str = "Responsable Inscripto"  # Responsable Inscripto, Monotributista, Exento, etc.
+    contacto_nombre: str = ""
+    contacto_telefono: str = ""
     items: List[ItemPedido]
     subtotal: float
     impuestos: float
     total: float
-    estado: str = "pendiente"  # pendiente, pagada, vencida
+    estado: str = "pendiente"  # pendiente, pagada, cobro_parcial, vencida
+    monto_pagado: float = 0.0  # Para cobros parciales
     fecha_emision: datetime = Field(default_factory=datetime.utcnow)
     fecha_vencimiento: datetime
     fecha_pago: Optional[datetime] = None
     notas: str = ""
+    condiciones: str = ""
 
 class FacturaCreate(BaseModel):
     numero_factura: str
+    tipo_factura: str = "A"
     pedido_id: Optional[str] = None
     cliente_id: str
     items: List[ItemPedido]
     impuestos: float = 0.0
     fecha_vencimiento: datetime
     notas: str = ""
+    condiciones: str = ""
 
 # Compra Model
 class ItemCompra(BaseModel):
