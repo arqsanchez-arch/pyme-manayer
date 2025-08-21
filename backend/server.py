@@ -324,6 +324,194 @@ class StatusCheck(BaseModel):
 class StatusCheckCreate(BaseModel):
     client_name: str
 
+# CRUD Endpoints for Presupuestos
+@api_router.post("/presupuestos", response_model=Presupuesto)
+async def create_presupuesto(presupuesto: PresupuestoCreate):
+    # Get client name
+    cliente = await db.clientes.find_one({"id": presupuesto.cliente_id})
+    cliente_nombre = cliente["nombre"] if cliente else ""
+    
+    # Calculate totals
+    subtotal = sum(item.subtotal for item in presupuesto.items)
+    total = subtotal + presupuesto.impuestos
+    
+    presupuesto_dict = presupuesto.dict()
+    presupuesto_dict["cliente_nombre"] = cliente_nombre
+    presupuesto_dict["subtotal"] = subtotal
+    presupuesto_dict["total"] = total
+    presupuesto_obj = Presupuesto(**presupuesto_dict)
+    await db.presupuestos.insert_one(presupuesto_obj.dict())
+    return presupuesto_obj
+
+@api_router.get("/presupuestos", response_model=List[Presupuesto])
+async def get_presupuestos():
+    presupuestos = await db.presupuestos.find().to_list(1000)
+    return [Presupuesto(**presupuesto) for presupuesto in presupuestos]
+
+@api_router.get("/presupuestos/{presupuesto_id}", response_model=Presupuesto)
+async def get_presupuesto(presupuesto_id: str):
+    presupuesto = await db.presupuestos.find_one({"id": presupuesto_id})
+    if not presupuesto:
+        raise HTTPException(status_code=404, detail="Presupuesto not found")
+    return Presupuesto(**presupuesto)
+
+@api_router.put("/presupuestos/{presupuesto_id}/estado")
+async def update_presupuesto_estado(presupuesto_id: str, estado: str):
+    valid_estados = ["borrador", "enviado", "aceptado", "rechazado", "convertido"]
+    if estado not in valid_estados:
+        raise HTTPException(status_code=400, detail="Invalid estado")
+    
+    result = await db.presupuestos.update_one({"id": presupuesto_id}, {"$set": {"estado": estado}})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Presupuesto not found")
+    return {"message": f"Presupuesto estado updated to {estado}"}
+
+# CRUD Endpoints for Notas de Crédito
+@api_router.post("/notas-credito", response_model=NotaCredito)
+async def create_nota_credito(nota: NotaCreditoCreate):
+    # Get client name
+    cliente = await db.clientes.find_one({"id": nota.cliente_id})
+    cliente_nombre = cliente["nombre"] if cliente else ""
+    
+    # Calculate totals
+    subtotal = sum(item.subtotal for item in nota.items)
+    total = subtotal + nota.impuestos
+    
+    nota_dict = nota.dict()
+    nota_dict["cliente_nombre"] = cliente_nombre
+    nota_dict["subtotal"] = subtotal
+    nota_dict["total"] = total
+    nota_obj = NotaCredito(**nota_dict)
+    await db.notas_credito.insert_one(nota_obj.dict())
+    return nota_obj
+
+@api_router.get("/notas-credito", response_model=List[NotaCredito])
+async def get_notas_credito():
+    notas = await db.notas_credito.find().to_list(1000)
+    return [NotaCredito(**nota) for nota in notas]
+
+@api_router.put("/notas-credito/{nota_id}/aplicar")
+async def aplicar_nota_credito(nota_id: str):
+    result = await db.notas_credito.update_one({"id": nota_id}, {"$set": {"estado": "aplicada"}})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Nota de crédito not found")
+    return {"message": "Nota de crédito aplicada"}
+
+# CRUD Endpoints for Notas de Débito
+@api_router.post("/notas-debito", response_model=NotaDebito)
+async def create_nota_debito(nota: NotaDebitoCreate):
+    # Get client name
+    cliente = await db.clientes.find_one({"id": nota.cliente_id})
+    cliente_nombre = cliente["nombre"] if cliente else ""
+    
+    # Calculate totals
+    subtotal = sum(item.subtotal for item in nota.items)
+    total = subtotal + nota.impuestos
+    
+    nota_dict = nota.dict()
+    nota_dict["cliente_nombre"] = cliente_nombre
+    nota_dict["subtotal"] = subtotal
+    nota_dict["total"] = total
+    nota_obj = NotaDebito(**nota_dict)
+    await db.notas_debito.insert_one(nota_obj.dict())
+    return nota_obj
+
+@api_router.get("/notas-debito", response_model=List[NotaDebito])
+async def get_notas_debito():
+    notas = await db.notas_debito.find().to_list(1000)
+    return [NotaDebito(**nota) for nota in notas]
+
+@api_router.put("/notas-debito/{nota_id}/aplicar")
+async def aplicar_nota_debito(nota_id: str):
+    result = await db.notas_debito.update_one({"id": nota_id}, {"$set": {"estado": "aplicada"}})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Nota de débito not found")
+    return {"message": "Nota de débito aplicada"}
+
+# CRUD Endpoints for Cuentas Corrientes
+@api_router.get("/cuentas-corrientes/{cliente_id}", response_model=CuentaCorrienteResumen)
+async def get_cuenta_corriente(cliente_id: str):
+    # Get client name
+    cliente = await db.clientes.find_one({"id": cliente_id})
+    if not cliente:
+        raise HTTPException(status_code=404, detail="Cliente not found")
+    
+    # Get all movements for this client
+    movimientos = await db.movimientos_cc.find({"cliente_id": cliente_id}).sort("fecha", -1).to_list(1000)
+    movimientos_list = [MovimientoCuentaCorriente(**mov) for mov in movimientos]
+    
+    # Calculate current balance
+    saldo_actual = sum(mov.haber - mov.debe for mov in movimientos_list)
+    
+    return CuentaCorrienteResumen(
+        cliente_id=cliente_id,
+        cliente_nombre=cliente["nombre"],
+        saldo_actual=saldo_actual,
+        movimientos=movimientos_list
+    )
+
+@api_router.get("/cuentas-corrientes", response_model=List[CuentaCorrienteResumen])
+async def get_all_cuentas_corrientes():
+    # Get all clients with movements
+    pipeline = [
+        {"$group": {"_id": "$cliente_id", "count": {"$sum": 1}}},
+        {"$match": {"count": {"$gt": 0}}}
+    ]
+    clientes_con_movimientos = await db.movimientos_cc.aggregate(pipeline).to_list(1000)
+    
+    result = []
+    for cliente_data in clientes_con_movimientos:
+        cliente_id = cliente_data["_id"]
+        cuenta_corriente = await get_cuenta_corriente(cliente_id)
+        result.append(cuenta_corriente)
+    
+    return result
+
+# CRUD Endpoints for Recibos
+@api_router.post("/recibos", response_model=Recibo)
+async def create_recibo(recibo: ReciboCreate):
+    # Get client name
+    cliente = await db.clientes.find_one({"id": recibo.cliente_id})
+    cliente_nombre = cliente["nombre"] if cliente else ""
+    
+    recibo_dict = recibo.dict()
+    recibo_dict["cliente_nombre"] = cliente_nombre
+    recibo_obj = Recibo(**recibo_dict)
+    await db.recibos.insert_one(recibo_obj.dict())
+    
+    # Create movement in cuenta corriente
+    movimiento = MovimientoCuentaCorriente(
+        cliente_id=recibo.cliente_id,
+        cliente_nombre=cliente_nombre,
+        tipo_movimiento="pago",
+        documento_id=recibo_obj.id,
+        numero_documento=recibo.numero_recibo,
+        haber=recibo.monto_total,
+        descripcion=f"Pago recibido - {recibo.observaciones}"
+    )
+    await db.movimientos_cc.insert_one(movimiento.dict())
+    
+    return recibo_obj
+
+@api_router.get("/recibos", response_model=List[Recibo])
+async def get_recibos():
+    recibos = await db.recibos.find().to_list(1000)
+    return [Recibo(**recibo) for recibo in recibos]
+
+@api_router.get("/recibos/{recibo_id}", response_model=Recibo)
+async def get_recibo(recibo_id: str):
+    recibo = await db.recibos.find_one({"id": recibo_id})
+    if not recibo:
+        raise HTTPException(status_code=404, detail="Recibo not found")
+    return Recibo(**recibo)
+
+@api_router.put("/recibos/{recibo_id}/anular")
+async def anular_recibo(recibo_id: str):
+    result = await db.recibos.update_one({"id": recibo_id}, {"$set": {"estado": "anulado"}})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Recibo not found")
+    return {"message": "Recibo anulado"}
+
 # CRUD Endpoints for Articulos
 @api_router.post("/articulos", response_model=Articulo)
 async def create_articulo(articulo: ArticuloCreate):
