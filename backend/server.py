@@ -693,6 +693,13 @@ async def marcar_factura_pagada(factura_id: str):
         raise HTTPException(status_code=404, detail="Factura not found")
     return {"message": "Factura marked as paid"}
 
+@api_router.delete("/facturas/{factura_id}")
+async def delete_factura(factura_id: str):
+    result = await db.facturas.delete_one({"id": factura_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Factura not found")
+    return {"message": "Factura deleted successfully"}
+
 # CRUD Endpoints for Compras
 @api_router.post("/compras", response_model=Compra)
 async def create_compra(compra: CompraCreate):
