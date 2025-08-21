@@ -30,6 +30,10 @@ function App() {
             <Route path="/facturas" element={<Facturas />} />
             <Route path="/compras" element={<Compras />} />
             <Route path="/remitos" element={<Remitos />} />
+            <Route path="/reportes/financiero" element={<ReporteFinanciero />} />
+            <Route path="/reportes/ventas" element={<ReporteVentas />} />
+            <Route path="/reportes/compras" element={<ReporteCompras />} />
+            <Route path="/configuracion" element={<Configuracion />} />
           </Routes>
         </Layout>
       </BrowserRouter>
