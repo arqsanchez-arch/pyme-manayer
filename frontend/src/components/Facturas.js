@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { Plus, Eye, CreditCard, Calendar } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, Printer, FileText, Mail, MessageCircle, Download } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
@@ -12,7 +12,7 @@ import { Badge } from "./ui/badge";
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-const Facturas = () => {
+const Facturas = ({ searchTerm }) => {
   const [facturas, setFacturas] = useState([]);
   const [clientes, setClientes] = useState([]);
   const [pedidos, setPedidos] = useState([]);
