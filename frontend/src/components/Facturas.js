@@ -48,6 +48,7 @@ const Facturas = ({ searchTerm }) => {
     items: [{ articulo_id: "", descripcion: "", cantidad: 1, precio_unitario: 0, subtotal: 0 }],
     
     // Totales
+    porcentaje_iva: "21", // 21% o 10.5%
     impuestos: 0,
     
     // Notas y condiciones
