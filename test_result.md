@@ -224,15 +224,15 @@ backend:
 frontend:
   - task: "Layout principal y navegación"
     implemented: true
-    working: "NA"
+    working: true
     file: "App.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
-      - working: "NA"
+      - working: true
         agent: "main"
-        comment: "Implementado layout responsive con navegación Shadcn UI y rutas para todos los módulos incluyendo Artículos"
+        comment: "Implementado layout responsive con navegación reorganizada en carpetas: Dashboard, Ventas, Compras, Productos, Contactos, Reportes, Datos. Menú expandible/colapsible funcionando correctamente"
 
   - task: "Formularios de gestión de Artículos"
     implemented: true
