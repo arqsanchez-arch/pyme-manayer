@@ -108,6 +108,122 @@ class PedidoCreate(BaseModel):
     fecha_entrega: Optional[datetime] = None
     notas: str = ""
 
+# Presupuesto Model
+class Presupuesto(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    numero_presupuesto: str
+    cliente_id: str
+    cliente_nombre: str = ""
+    items: List[ItemPedido]
+    subtotal: float
+    impuestos: float
+    total: float
+    estado: str = "borrador"  # borrador, enviado, aceptado, rechazado, convertido
+    fecha_emision: datetime = Field(default_factory=datetime.utcnow)
+    fecha_vencimiento: datetime
+    validez_dias: int = 30
+    notas: str = ""
+
+class PresupuestoCreate(BaseModel):
+    numero_presupuesto: str
+    cliente_id: str
+    items: List[ItemPedido]
+    impuestos: float = 0.0
+    fecha_vencimiento: datetime
+    validez_dias: int = 30
+    notas: str = ""
+
+# Nota de Crédito Model
+class NotaCredito(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    numero_nota: str
+    factura_id: str
+    cliente_id: str
+    cliente_nombre: str = ""
+    motivo: str
+    items: List[ItemPedido]
+    subtotal: float
+    impuestos: float
+    total: float
+    fecha_emision: datetime = Field(default_factory=datetime.utcnow)
+    estado: str = "pendiente"  # pendiente, aplicada
+    notas: str = ""
+
+class NotaCreditoCreate(BaseModel):
+    numero_nota: str
+    factura_id: str
+    cliente_id: str
+    motivo: str
+    items: List[ItemPedido]
+    impuestos: float = 0.0
+    notas: str = ""
+
+# Nota de Débito Model
+class NotaDebito(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    numero_nota: str
+    factura_id: str = None
+    cliente_id: str
+    cliente_nombre: str = ""
+    motivo: str
+    items: List[ItemPedido]
+    subtotal: float
+    impuestos: float
+    total: float
+    fecha_emision: datetime = Field(default_factory=datetime.utcnow)
+    estado: str = "pendiente"  # pendiente, aplicada
+    notas: str = ""
+
+class NotaDebitoCreate(BaseModel):
+    numero_nota: str
+    factura_id: str = None
+    cliente_id: str
+    motivo: str
+    items: List[ItemPedido]
+    impuestos: float = 0.0
+    notas: str = ""
+
+# Cuenta Corriente Model
+class MovimientoCuentaCorriente(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    cliente_id: str
+    cliente_nombre: str = ""
+    tipo_movimiento: str  # factura, pago, nota_credito, nota_debito
+    documento_id: str  # ID del documento relacionado
+    numero_documento: str
+    debe: float = 0.0
+    haber: float = 0.0
+    saldo: float = 0.0
+    fecha: datetime = Field(default_factory=datetime.utcnow)
+    descripcion: str = ""
+
+class CuentaCorrienteResumen(BaseModel):
+    cliente_id: str
+    cliente_nombre: str
+    saldo_actual: float
+    movimientos: List[MovimientoCuentaCorriente]
+
+# Recibo Model
+class Recibo(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    numero_recibo: str
+    cliente_id: str
+    cliente_nombre: str = ""
+    facturas_aplicadas: List[str] = []  # IDs de facturas
+    forma_pago: str = "efectivo"  # efectivo, transferencia, cheque, tarjeta
+    monto_total: float
+    fecha_pago: datetime = Field(default_factory=datetime.utcnow)
+    observaciones: str = ""
+    estado: str = "activo"  # activo, anulado
+
+class ReciboCreate(BaseModel):
+    numero_recibo: str
+    cliente_id: str
+    facturas_aplicadas: List[str] = []
+    forma_pago: str = "efectivo"
+    monto_total: float
+    observaciones: str = ""
+
 # Factura Model
 class Factura(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
