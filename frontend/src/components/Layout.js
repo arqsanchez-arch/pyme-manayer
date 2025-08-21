@@ -41,13 +41,9 @@ const Layout = ({ children }) => {
     {
       id: 'ventas',
       name: 'Ventas',
+      href: '/ventas',
       icon: TrendingUp,
-      isSection: true,
-      items: [
-        { name: 'Pedidos', href: '/pedidos', icon: ShoppingCart },
-        { name: 'Facturas', href: '/facturas', icon: FileText },
-        { name: 'Remitos', href: '/remitos', icon: Truck },
-      ]
+      isSection: false
     },
     {
       id: 'compras',
