@@ -146,12 +146,18 @@ const Facturas = ({ searchTerm }) => {
       setDialogOpen(false);
       setFormData({
         numero_factura: "",
+        tipo_factura: "A",
+        fecha_emision: new Date().toISOString().split('T')[0],
+        fecha_vencimiento: "",
         cliente_id: "",
+        condicion_iva: "Responsable Inscripto",
+        contacto_nombre: "",
+        contacto_telefono: "",
         pedido_id: "",
         items: [{ descripcion: "", cantidad: 1, precio_unitario: 0, subtotal: 0 }],
         impuestos: 0,
-        fecha_vencimiento: "",
-        notas: ""
+        notas: "",
+        condiciones: ""
       });
       fetchFacturas();
     } catch (error) {
