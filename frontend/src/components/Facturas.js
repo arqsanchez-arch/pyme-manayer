@@ -144,17 +144,65 @@ const Facturas = ({ searchTerm }) => {
     }
   };
 
-  const getEstadoBadge = (estado, fechaVencimiento) => {
+  const deleteFactura = async (facturaId) => {
+    if (window.confirm("¿Está seguro de que desea eliminar esta factura?")) {
+      try {
+        await axios.delete(`${API}/facturas/${facturaId}`);
+        fetchFacturas();
+      } catch (error) {
+        console.error("Error deleting factura:", error);
+      }
+    }
+  };
+
+  const getEstadoBadge = (estado, fechaVencimiento, fechaPago, total) => {
     const now = new Date();
     const vencimiento = new Date(fechaVencimiento);
     
     if (estado === 'pagada') {
-      return <Badge variant="outline" className="bg-green-50 text-green-700">Pagada</Badge>;
+      return <Badge variant="outline" className="bg-green-50 text-green-700">Cobro Total</Badge>;
+    } else if (fechaPago && estado === 'pendiente') {
+      // Lógica para cobro parcial - se podría implementar con un campo adicional
+      return <Badge variant="secondary" className="bg-yellow-50 text-yellow-700">Cobro Parcial</Badge>;
     } else if (now > vencimiento) {
       return <Badge variant="destructive">Vencida</Badge>;
     } else {
       return <Badge variant="default">Pendiente</Badge>;
     }
+  };
+
+  // Funciones para acciones
+  const handlePrint = (factura) => {
+    console.log("Imprimir factura:", factura.numero_factura);
+    // Implementar lógica de impresión
+  };
+
+  const handleDownloadPDF = (factura) => {
+    console.log("Descargar PDF:", factura.numero_factura);
+    // Implementar lógica de descarga PDF
+  };
+
+  const handleSendEmail = (factura) => {
+    console.log("Enviar email:", factura.numero_factura);
+    // Implementar lógica de envío por email
+  };
+
+  const handleSendWhatsApp = (factura) => {
+    console.log("Enviar WhatsApp:", factura.numero_factura);
+    // Implementar lógica de envío por WhatsApp
+  };
+
+  const handleEdit = (factura) => {
+    setFormData({
+      numero_factura: factura.numero_factura,
+      cliente_id: factura.cliente_id,
+      pedido_id: factura.pedido_id || "",
+      items: factura.items,
+      impuestos: factura.impuestos,
+      fecha_vencimiento: new Date(factura.fecha_vencimiento).toISOString().split('T')[0],
+      notas: factura.notas
+    });
+    setDialogOpen(true);
   };
 
   const subtotal = formData.items.reduce((sum, item) => sum + item.subtotal, 0);
