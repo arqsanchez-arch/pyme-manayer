@@ -20,14 +20,38 @@ const Facturas = ({ searchTerm }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [viewingFactura, setViewingFactura] = useState(null);
+  
+  // Filtros específicos
+  const [filtros, setFiltros] = useState({
+    busqueda: "",
+    estado: "todos" // todos, cobro_total, cobro_parcial, pendiente, vencida
+  });
+
   const [formData, setFormData] = useState({
+    // Datos de la factura
     numero_factura: "",
-    cliente_id: "",
-    pedido_id: "",
-    items: [{ descripcion: "", cantidad: 1, precio_unitario: 0, subtotal: 0 }],
-    impuestos: 0,
+    tipo_factura: "A",
+    fecha_emision: new Date().toISOString().split('T')[0],
     fecha_vencimiento: "",
-    notas: ""
+    
+    // Cliente
+    cliente_id: "",
+    condicion_iva: "Responsable Inscripto",
+    contacto_nombre: "",
+    contacto_telefono: "",
+    
+    // Pedido base
+    pedido_id: "",
+    
+    // Items
+    items: [{ descripcion: "", cantidad: 1, precio_unitario: 0, subtotal: 0 }],
+    
+    // Totales
+    impuestos: 0,
+    
+    // Notas y condiciones
+    notas: "",
+    condiciones: ""
   });
 
   useEffect(() => {
