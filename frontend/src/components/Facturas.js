@@ -731,7 +731,7 @@ const Facturas = ({ searchTerm }) => {
                       </div>
                     </td>
                     <td className="p-4 text-center">
-                      {getEstadoBadge(factura.estado, factura.fecha_vencimiento, factura.fecha_pago, factura.total)}
+                      {getEstadoBadge(factura.estado, factura.fecha_vencimiento, factura.fecha_pago, factura.total, factura.monto_pagado)}
                     </td>
                     <td className="p-4">
                       <div className="flex justify-center gap-1">
