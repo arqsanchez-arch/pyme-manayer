@@ -321,9 +321,6 @@ const Facturas = ({ searchTerm }) => {
     setDialogOpen(true);
   };
 
-  const subtotal = formData.items.reduce((sum, item) => sum + item.subtotal, 0);
-  const total = subtotal + parseFloat(formData.impuestos || 0);
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-32">
