@@ -352,7 +352,7 @@ const NotasDebito = ({ searchTerm }) => {
               <div className="space-y-2 text-sm">
                 <p><strong>Total:</strong> ${nota.total.toLocaleString()}</p>
                 <p><strong>Motivo:</strong> {nota.motivo}</p>
-                <p><strong>Fecha:</strong> {new Date(nota.fecha_emision).toLocaleDateDate()}</p>
+                <p><strong>Fecha:</strong> {new Date(nota.fecha_emision).toLocaleDateString()}</p>
               </div>
               
               <div className="flex gap-2 mt-4">
