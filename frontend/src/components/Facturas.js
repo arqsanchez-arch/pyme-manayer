@@ -402,62 +402,136 @@ const Facturas = ({ searchTerm }) => {
         </Dialog>
       </div>
 
-      {/* Facturas List */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {facturas.map((factura) => (
-          <Card key={factura.id}>
-            <CardHeader>
-              <div className="flex justify-between items-start">
-                <div>
-                  <CardTitle className="text-lg">{factura.numero_factura}</CardTitle>
-                  <p className="text-sm text-gray-600">{factura.cliente_nombre}</p>
-                </div>
-                {getEstadoBadge(factura.estado, factura.fecha_vencimiento)}
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2 text-sm">
-                <p><strong>Total:</strong> ${factura.total.toLocaleString()}</p>
-                <p><strong>Emisión:</strong> {new Date(factura.fecha_emision).toLocaleDateString()}</p>
-                <p><strong>Vencimiento:</strong> {new Date(factura.fecha_vencimiento).toLocaleDateString()}</p>
-                {factura.fecha_pago && (
-                  <p><strong>Pagada:</strong> {new Date(factura.fecha_pago).toLocaleDateString()}</p>
-                )}
-              </div>
-              
-              <div className="flex gap-2 mt-4">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setViewingFactura(factura);
-                    setViewDialogOpen(true);
-                  }}
-                  className="flex-1"
-                >
-                  <Eye className="mr-2 h-4 w-4" />
-                  Ver
-                </Button>
-                
-                {factura.estado === 'pendiente' && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => marcarPagada(factura.id)}
-                    className="text-green-600 hover:text-green-700"
-                  >
-                    <CreditCard className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      {/* Facturas Table */}
+      <Card>
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b">
+                <tr>
+                  <th className="text-left p-4 font-medium text-gray-700">N° de Factura</th>
+                  <th className="text-left p-4 font-medium text-gray-700">Cliente</th>
+                  <th className="text-left p-4 font-medium text-gray-700">Fecha</th>
+                  <th className="text-right p-4 font-medium text-gray-700">Monto</th>
+                  <th className="text-center p-4 font-medium text-gray-700">Estado</th>
+                  <th className="text-center p-4 font-medium text-gray-700">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredFacturas.map((factura, index) => (
+                  <tr key={factura.id} className={`border-b hover:bg-gray-50 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'}`}>
+                    <td className="p-4">
+                      <div>
+                        <p className="font-medium text-gray-900">{factura.numero_factura}</p>
+                        <p className="text-sm text-gray-500">
+                          Emisión: {new Date(factura.fecha_emision).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </td>
+                    <td className="p-4">
+                      <div>
+                        <p className="font-medium text-gray-900">{factura.cliente_nombre}</p>
+                        <p className="text-sm text-gray-500">
+                          Vence: {new Date(factura.fecha_vencimiento).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </td>
+                    <td className="p-4 text-gray-600">
+                      {new Date(factura.fecha_emision).toLocaleDateString()}
+                    </td>
+                    <td className="p-4 text-right">
+                      <div>
+                        <p className="font-bold text-gray-900">${factura.total.toLocaleString()}</p>
+                        <p className="text-sm text-gray-500">IVA inc.</p>
+                      </div>
+                    </td>
+                    <td className="p-4 text-center">
+                      {getEstadoBadge(factura.estado, factura.fecha_vencimiento, factura.fecha_pago, factura.total)}
+                    </td>
+                    <td className="p-4">
+                      <div className="flex justify-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setViewingFactura(factura);
+                            setViewDialogOpen(true);
+                          }}
+                          title="Ver detalle"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleEdit(factura)}
+                          title="Editar"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => deleteFactura(factura.id)}
+                          title="Eliminar"
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                        
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handlePrint(factura)}
+                          title="Imprimir"
+                        >
+                          <Printer className="h-4 w-4" />
+                        </Button>
+                        
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDownloadPDF(factura)}
+                          title="Descargar PDF"
+                        >
+                          <Download className="h-4 w-4" />
+                        </Button>
+                        
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleSendEmail(factura)}
+                          title="Enviar por Email"
+                        >
+                          <Mail className="h-4 w-4" />
+                        </Button>
+                        
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleSendWhatsApp(factura)}
+                          title="Enviar por WhatsApp"
+                          className="text-green-600"
+                        >
+                          <MessageCircle className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
 
-      {facturas.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-gray-500">No hay facturas registradas</p>
+      {filteredFacturas.length === 0 && (
+        <div className="text-center py-8">
+          <p className="text-gray-500">
+            {searchTerm ? "No se encontraron facturas con ese criterio" : "No hay facturas registradas"}
+          </p>
         </div>
       )}
 
