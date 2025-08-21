@@ -179,20 +179,63 @@ const Facturas = ({ searchTerm }) => {
     }
   };
 
-  const getEstadoBadge = (estado, fechaVencimiento, fechaPago, total) => {
+  const getEstadoBadge = (estado, fechaVencimiento, fechaPago, total, montoPagado = 0) => {
     const now = new Date();
     const vencimiento = new Date(fechaVencimiento);
     
-    if (estado === 'pagada') {
+    if (estado === 'pagada' || montoPagado >= total) {
       return <Badge variant="outline" className="bg-green-50 text-green-700">Cobro Total</Badge>;
-    } else if (fechaPago && estado === 'pendiente') {
-      // Lógica para cobro parcial - se podría implementar con un campo adicional
+    } else if (montoPagado > 0 && montoPagado < total) {
       return <Badge variant="secondary" className="bg-yellow-50 text-yellow-700">Cobro Parcial</Badge>;
-    } else if (now > vencimiento) {
+    } else if (now > vencimiento && estado === 'pendiente') {
       return <Badge variant="destructive">Vencida</Badge>;
     } else {
       return <Badge variant="default">Pendiente</Badge>;
     }
+  };
+
+  // Función para obtener el estado real de la factura
+  const getFacturaEstado = (factura) => {
+    const now = new Date();
+    const vencimiento = new Date(factura.fecha_vencimiento);
+    const montoPagado = factura.monto_pagado || 0;
+    
+    if (factura.estado === 'pagada' || montoPagado >= factura.total) {
+      return 'cobro_total';
+    } else if (montoPagado > 0 && montoPagado < factura.total) {
+      return 'cobro_parcial';
+    } else if (now > vencimiento && factura.estado === 'pendiente') {
+      return 'vencida';
+    } else {
+      return 'pendiente';
+    }
+  };
+
+  // Filtrado de facturas
+  const filteredFacturas = facturas.filter(factura => {
+    // Filtro por búsqueda (cliente o número)
+    const matchesSearch = !filtros.busqueda || 
+      factura.numero_factura?.toLowerCase().includes(filtros.busqueda.toLowerCase()) ||
+      factura.cliente_nombre?.toLowerCase().includes(filtros.busqueda.toLowerCase());
+    
+    // Filtro por estado
+    const facturaEstado = getFacturaEstado(factura);
+    const matchesEstado = filtros.estado === 'todos' || facturaEstado === filtros.estado;
+    
+    // También aplicar el searchTerm del componente padre si existe
+    const matchesParentSearch = !searchTerm || 
+      factura.numero_factura?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      factura.cliente_nombre?.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    return matchesSearch && matchesEstado && matchesParentSearch;
+  });
+
+  // Función para limpiar filtros
+  const limpiarFiltros = () => {
+    setFiltros({
+      busqueda: "",
+      estado: "todos"
+    });
   };
 
   // Funciones para acciones
