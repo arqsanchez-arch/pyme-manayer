@@ -400,7 +400,6 @@ const Facturas = ({ searchTerm }) => {
             </form>
           </DialogContent>
         </Dialog>
-      </div>
 
       {/* Facturas Table */}
       <Card>
