@@ -205,12 +205,17 @@ const Facturas = ({ searchTerm }) => {
     setDialogOpen(true);
   };
 
+  const filteredFacturas = facturas.filter(factura =>
+    (factura.numero_factura?.toLowerCase().includes(searchTerm?.toLowerCase() || "") ||
+     factura.cliente_nombre?.toLowerCase().includes(searchTerm?.toLowerCase() || ""))
+  );
+
   const subtotal = formData.items.reduce((sum, item) => sum + item.subtotal, 0);
   const total = subtotal + parseFloat(formData.impuestos || 0);
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex items-center justify-center h-32">
         <div className="text-lg">Cargando facturas...</div>
       </div>
     );
