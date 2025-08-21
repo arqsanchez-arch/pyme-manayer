@@ -173,7 +173,10 @@ const Facturas = ({ searchTerm }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const facturaData = { ...formData };
+      const facturaData = { 
+        ...formData,
+        impuestos: impuestosCalculados // Usar el IVA calculado automáticamente
+      };
       if (!facturaData.numero_factura) {
         facturaData.numero_factura = `FAC-${Date.now()}`;
       }
