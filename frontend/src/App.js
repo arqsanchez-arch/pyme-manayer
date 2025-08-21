@@ -5,6 +5,7 @@ import "./App.css";
 // Components
 import Layout from "./components/Layout";
 import Dashboard from "./components/Dashboard";
+import Ventas from "./components/Ventas";
 import Articulos from "./components/Articulos";
 import Clientes from "./components/Clientes";
 import Pedidos from "./components/Pedidos";
