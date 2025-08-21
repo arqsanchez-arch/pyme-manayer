@@ -262,20 +262,21 @@ const Facturas = ({ searchTerm }) => {
   const handleEdit = (factura) => {
     setFormData({
       numero_factura: factura.numero_factura,
+      tipo_factura: factura.tipo_factura || "A",
+      fecha_emision: new Date(factura.fecha_emision).toISOString().split('T')[0],
+      fecha_vencimiento: new Date(factura.fecha_vencimiento).toISOString().split('T')[0],
       cliente_id: factura.cliente_id,
+      condicion_iva: factura.condicion_iva || "Responsable Inscripto",
+      contacto_nombre: factura.contacto_nombre || "",
+      contacto_telefono: factura.contacto_telefono || "",
       pedido_id: factura.pedido_id || "",
       items: factura.items,
       impuestos: factura.impuestos,
-      fecha_vencimiento: new Date(factura.fecha_vencimiento).toISOString().split('T')[0],
-      notas: factura.notas
+      notas: factura.notas,
+      condiciones: factura.condiciones || ""
     });
     setDialogOpen(true);
   };
-
-  const filteredFacturas = facturas.filter(factura =>
-    (factura.numero_factura?.toLowerCase().includes(searchTerm?.toLowerCase() || "") ||
-     factura.cliente_nombre?.toLowerCase().includes(searchTerm?.toLowerCase() || ""))
-  );
 
   const subtotal = formData.items.reduce((sum, item) => sum + item.subtotal, 0);
   const total = subtotal + parseFloat(formData.impuestos || 0);
