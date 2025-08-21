@@ -192,6 +192,7 @@ const Facturas = ({ searchTerm }) => {
         contacto_telefono: "",
         pedido_id: "",
         items: [{ articulo_id: "", descripcion: "", cantidad: 1, precio_unitario: 0, subtotal: 0 }],
+        porcentaje_iva: "21",
         impuestos: 0,
         notas: "",
         condiciones: ""
