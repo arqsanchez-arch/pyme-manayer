@@ -16,6 +16,7 @@ const Facturas = ({ searchTerm }) => {
   const [facturas, setFacturas] = useState([]);
   const [clientes, setClientes] = useState([]);
   const [pedidos, setPedidos] = useState([]);
+  const [articulos, setArticulos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
@@ -44,7 +45,7 @@ const Facturas = ({ searchTerm }) => {
     pedido_id: "",
     
     // Items
-    items: [{ descripcion: "", cantidad: 1, precio_unitario: 0, subtotal: 0 }],
+    items: [{ articulo_id: "", descripcion: "", cantidad: 1, precio_unitario: 0, subtotal: 0 }],
     
     // Totales
     impuestos: 0,
@@ -58,7 +59,17 @@ const Facturas = ({ searchTerm }) => {
     fetchFacturas();
     fetchClientes();
     fetchPedidos();
+    fetchArticulos();
   }, []);
+
+  const fetchArticulos = async () => {
+    try {
+      const response = await axios.get(`${API}/articulos`);
+      setArticulos(response.data);
+    } catch (error) {
+      console.error("Error fetching articulos:", error);
+    }
+  };
 
   const fetchFacturas = async () => {
     try {
