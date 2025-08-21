@@ -105,6 +105,17 @@ const Facturas = ({ searchTerm }) => {
     return parseFloat(cantidad) * parseFloat(precio) || 0;
   };
 
+  // Función para calcular IVA automáticamente
+  const calculateIVA = (subtotal, porcentaje) => {
+    const porcentajeDecimal = parseFloat(porcentaje) / 100;
+    return subtotal * porcentajeDecimal;
+  };
+
+  // Calcular subtotal e IVA automáticamente
+  const subtotal = formData.items.reduce((sum, item) => sum + item.subtotal, 0);
+  const impuestosCalculados = calculateIVA(subtotal, formData.porcentaje_iva);
+  const total = subtotal + impuestosCalculados;
+
   const handleItemChange = (index, field, value) => {
     const newItems = [...formData.items];
     newItems[index] = { ...newItems[index], [field]: value };
