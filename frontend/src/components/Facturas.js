@@ -297,6 +297,68 @@ const Facturas = ({ searchTerm }) => {
 
   return (
     <div className="space-y-4">
+      {/* Filtros específicos */}
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex flex-wrap gap-3 items-center">
+            {/* Búsqueda por cliente o número */}
+            <div className="flex-1 min-w-64">
+              <Input
+                placeholder="Buscar por cliente o número de factura..."
+                value={filtros.busqueda}
+                onChange={(e) => setFiltros({...filtros, busqueda: e.target.value})}
+              />
+            </div>
+            
+            {/* Filtros de estado */}
+            <Button 
+              variant={filtros.estado === 'cobro_total' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setFiltros({...filtros, estado: 'cobro_total'})}
+              className="text-green-700"
+            >
+              Cobro Total
+            </Button>
+            
+            <Button 
+              variant={filtros.estado === 'cobro_parcial' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setFiltros({...filtros, estado: 'cobro_parcial'})}
+              className="text-yellow-700"
+            >
+              Cobro Parcial
+            </Button>
+            
+            <Button 
+              variant={filtros.estado === 'pendiente' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setFiltros({...filtros, estado: 'pendiente'})}
+            >
+              Pendiente
+            </Button>
+            
+            <Button 
+              variant={filtros.estado === 'vencida' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setFiltros({...filtros, estado: 'vencida'})}
+              className="text-red-700"
+            >
+              Vencidas
+            </Button>
+            
+            {/* Botón para restaurar filtros */}
+            <Button 
+              variant="ghost"
+              size="sm"
+              onClick={limpiarFiltros}
+              className="text-gray-600"
+            >
+              Restaurar Filtros
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Create Button */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogTrigger asChild>
@@ -305,175 +367,325 @@ const Facturas = ({ searchTerm }) => {
             Nueva Factura
           </Button>
         </DialogTrigger>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Nueva Factura</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="numero_factura">Número de Factura</Label>
-                  <Input
-                    id="numero_factura"
-                    value={formData.numero_factura}
-                    onChange={(e) => setFormData({...formData, numero_factura: e.target.value})}
-                    placeholder="Se generará automáticamente si se deja vacío"
-                  />
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Nueva Factura</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* BLOQUE 1: DATOS DE LA FACTURA */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Datos de la Factura</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div>
+                    <Label htmlFor="numero_factura">N° de Factura</Label>
+                    <Input
+                      id="numero_factura"
+                      value={formData.numero_factura}
+                      onChange={(e) => setFormData({...formData, numero_factura: e.target.value})}
+                      placeholder="Se generará automáticamente"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="tipo_factura">Tipo de Factura</Label>
+                    <Select value={formData.tipo_factura} onValueChange={(value) => setFormData({...formData, tipo_factura: value})}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="A">Tipo A</SelectItem>
+                        <SelectItem value="B">Tipo B</SelectItem>
+                        <SelectItem value="C">Tipo C</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="fecha_emision">Fecha de Emisión</Label>
+                    <Input
+                      id="fecha_emision"
+                      type="date"
+                      value={formData.fecha_emision}
+                      onChange={(e) => setFormData({...formData, fecha_emision: e.target.value})}
+                      required
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="fecha_vencimiento">Fecha de Vencimiento *</Label>
+                    <Input
+                      id="fecha_vencimiento"
+                      type="date"
+                      value={formData.fecha_vencimiento}
+                      onChange={(e) => setFormData({...formData, fecha_vencimiento: e.target.value})}
+                      required
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* BLOQUE 2: DATOS DEL CLIENTE */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Datos del Cliente</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="md:col-span-2">
+                    <Label htmlFor="cliente_id">Cliente *</Label>
+                    <Select value={formData.cliente_id} onValueChange={(value) => setFormData({...formData, cliente_id: value})}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Seleccionar cliente" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {clientes.map((cliente) => (
+                          <SelectItem key={cliente.id} value={cliente.id}>
+                            {cliente.nombre} - {cliente.email}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
                 
-                <div>
-                  <Label htmlFor="fecha_vencimiento">Fecha de Vencimiento *</Label>
-                  <Input
-                    id="fecha_vencimiento"
-                    type="date"
-                    value={formData.fecha_vencimiento}
-                    onChange={(e) => setFormData({...formData, fecha_vencimiento: e.target.value})}
-                    required
-                  />
+                {/* Mostrar datos del cliente seleccionado */}
+                {formData.cliente_id && (
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    {(() => {
+                      const clienteSeleccionado = clientes.find(c => c.id === formData.cliente_id);
+                      return clienteSeleccionado ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                          <div><strong>Nombre:</strong> {clienteSeleccionado.nombre}</div>
+                          <div><strong>Email:</strong> {clienteSeleccionado.email}</div>
+                          <div><strong>Dirección:</strong> {clienteSeleccionado.direccion}</div>
+                          <div><strong>Teléfono:</strong> {clienteSeleccionado.telefono}</div>
+                          <div><strong>CUIT:</strong> {clienteSeleccionado.cuit_dni}</div>
+                        </div>
+                      ) : null;
+                    })()}
+                  </div>
+                )}
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <Label htmlFor="condicion_iva">Condición del IVA</Label>
+                    <Select value={formData.condicion_iva} onValueChange={(value) => setFormData({...formData, condicion_iva: value})}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Responsable Inscripto">Responsable Inscripto</SelectItem>
+                        <SelectItem value="Monotributista">Monotributista</SelectItem>
+                        <SelectItem value="Exento">Exento</SelectItem>
+                        <SelectItem value="Consumidor Final">Consumidor Final</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="contacto_nombre">Contacto</Label>
+                    <Input
+                      id="contacto_nombre"
+                      value={formData.contacto_nombre}
+                      onChange={(e) => setFormData({...formData, contacto_nombre: e.target.value})}
+                      placeholder="Nombre del contacto"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="contacto_telefono">Teléfono Contacto</Label>
+                    <Input
+                      id="contacto_telefono"
+                      value={formData.contacto_telefono}
+                      onChange={(e) => setFormData({...formData, contacto_telefono: e.target.value})}
+                      placeholder="Teléfono del contacto"
+                    />
+                  </div>
                 </div>
-              </div>
 
-              <div className="grid grid-cols-2 gap-4">
+                {/* Opción de cargar desde pedido */}
                 <div>
                   <Label htmlFor="pedido_id">Basado en Pedido (Opcional)</Label>
                   <Select value={formData.pedido_id} onValueChange={loadPedidoItems}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar pedido" />
+                      <SelectValue placeholder="Seleccionar pedido completado" />
                     </SelectTrigger>
                     <SelectContent>
                       {pedidos.map((pedido) => (
                         <SelectItem key={pedido.id} value={pedido.id}>
-                          {pedido.numero_pedido} - {pedido.cliente_nombre}
+                          {pedido.numero_pedido} - {pedido.cliente_nombre} - ${pedido.total}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
+              </CardContent>
+            </Card>
 
-                <div>
-                  <Label htmlFor="cliente_id">Cliente *</Label>
-                  <Select value={formData.cliente_id} onValueChange={(value) => setFormData({...formData, cliente_id: value})}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar cliente" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {clientes.map((cliente) => (
-                        <SelectItem key={cliente.id} value={cliente.id}>
-                          {cliente.nombre}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              {/* Items */}
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <Label>Items de la Factura *</Label>
+            {/* BLOQUE 3: DETALLE DE PRODUCTOS */}
+            <Card>
+              <CardHeader>
+                <div className="flex justify-between items-center">
+                  <CardTitle className="text-lg">Detalle de Productos</CardTitle>
                   <Button type="button" onClick={addItem} size="sm">
                     Agregar Item
                   </Button>
                 </div>
-                
-                {formData.items.map((item, index) => (
-                  <div key={index} className="grid grid-cols-12 gap-2 mb-2 p-3 border rounded">
-                    <div className="col-span-5">
-                      <Input
-                        placeholder="Descripción"
-                        value={item.descripcion}
-                        onChange={(e) => handleItemChange(index, 'descripcion', e.target.value)}
-                        required
-                      />
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {formData.items.map((item, index) => (
+                    <div key={index} className="grid grid-cols-12 gap-2 p-3 border rounded-lg">
+                      <div className="col-span-5">
+                        <Label className="text-xs">Descripción *</Label>
+                        <Input
+                          placeholder="Descripción del producto/servicio"
+                          value={item.descripcion}
+                          onChange={(e) => handleItemChange(index, 'descripcion', e.target.value)}
+                          required
+                        />
+                      </div>
+                      <div className="col-span-2">
+                        <Label className="text-xs">Cantidad *</Label>
+                        <Input
+                          type="number"
+                          placeholder="1"
+                          value={item.cantidad}
+                          onChange={(e) => handleItemChange(index, 'cantidad', e.target.value)}
+                          min="1"
+                          required
+                        />
+                      </div>
+                      <div className="col-span-2">
+                        <Label className="text-xs">Precio Unitario *</Label>
+                        <Input
+                          type="number"
+                          placeholder="0.00"
+                          value={item.precio_unitario}
+                          onChange={(e) => handleItemChange(index, 'precio_unitario', e.target.value)}
+                          min="0"
+                          step="0.01"
+                          required
+                        />
+                      </div>
+                      <div className="col-span-2">
+                        <Label className="text-xs">Subtotal</Label>
+                        <Input
+                          value={`$${item.subtotal.toFixed(2)}`}
+                          readOnly
+                          className="bg-gray-50 font-medium"
+                        />
+                      </div>
+                      <div className="col-span-1">
+                        <Label className="text-xs text-transparent">-</Label>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => removeItem(index)}
+                          disabled={formData.items.length === 1}
+                          className="w-full"
+                        >
+                          ×
+                        </Button>
+                      </div>
                     </div>
-                    <div className="col-span-2">
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* BLOQUE 4: TOTALES */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Totales</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="impuestos">Impuestos/IVA</Label>
                       <Input
+                        id="impuestos"
                         type="number"
-                        placeholder="Cantidad"
-                        value={item.cantidad}
-                        onChange={(e) => handleItemChange(index, 'cantidad', e.target.value)}
-                        min="1"
-                        required
-                      />
-                    </div>
-                    <div className="col-span-2">
-                      <Input
-                        type="number"
-                        placeholder="Precio"
-                        value={item.precio_unitario}
-                        onChange={(e) => handleItemChange(index, 'precio_unitario', e.target.value)}
+                        value={formData.impuestos}
+                        onChange={(e) => setFormData({...formData, impuestos: e.target.value})}
                         min="0"
                         step="0.01"
-                        required
+                        placeholder="0.00"
                       />
                     </div>
-                    <div className="col-span-2">
-                      <Input
-                        placeholder="Subtotal"
-                        value={item.subtotal.toFixed(2)}
-                        readOnly
-                        className="bg-gray-50"
-                      />
-                    </div>
-                    <div className="col-span-1">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => removeItem(index)}
-                        disabled={formData.items.length === 1}
-                      >
-                        ×
-                      </Button>
-                    </div>
                   </div>
-                ))}
-                
-                <div className="space-y-2 mt-4 p-3 bg-gray-50 rounded">
-                  <div>
-                    <Label htmlFor="impuestos">Impuestos/IVA</Label>
-                    <Input
-                      id="impuestos"
-                      type="number"
-                      value={formData.impuestos}
-                      onChange={(e) => setFormData({...formData, impuestos: e.target.value})}
-                      min="0"
-                      step="0.01"
-                    />
-                  </div>
-                  <div className="text-right">
-                    <p>Subtotal: ${subtotal.toFixed(2)}</p>
-                    <p>Impuestos: ${parseFloat(formData.impuestos || 0).toFixed(2)}</p>
-                    <p className="text-lg font-bold">Total: ${total.toFixed(2)}</p>
+                  
+                  <div className="bg-blue-50 p-4 rounded-lg">
+                    <div className="flex justify-between items-center text-lg">
+                      <span>Subtotal:</span>
+                      <span className="font-medium">${subtotal.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-lg">
+                      <span>Impuestos:</span>
+                      <span className="font-medium">${parseFloat(formData.impuestos || 0).toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-xl font-bold text-blue-700 mt-2 pt-2 border-t border-blue-200">
+                      <span>TOTAL FACTURA:</span>
+                      <span>${total.toFixed(2)}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </CardContent>
+            </Card>
 
-              <div>
-                <Label htmlFor="notas">Notas</Label>
-                <Input
-                  id="notas"
-                  value={formData.notas}
-                  onChange={(e) => setFormData({...formData, notas: e.target.value})}
-                />
-              </div>
-              
-              <div className="flex gap-2 pt-4">
-                <Button type="submit" className="flex-1">
-                  Crear Factura
-                </Button>
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={() => setDialogOpen(false)}
-                  className="flex-1"
-                >
-                  Cancelar
-                </Button>
-              </div>
-            </form>
-          </DialogContent>
-        </Dialog>
+            {/* BLOQUE 5: NOTAS Y CONDICIONES */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Notas y Condiciones</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label htmlFor="notas">Notas</Label>
+                  <textarea
+                    id="notas"
+                    value={formData.notas}
+                    onChange={(e) => setFormData({...formData, notas: e.target.value})}
+                    className="w-full min-h-20 p-3 border border-gray-300 rounded-md"
+                    placeholder="Notas adicionales para la factura..."
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="condiciones">Condiciones</Label>
+                  <textarea
+                    id="condiciones"
+                    value={formData.condiciones}
+                    onChange={(e) => setFormData({...formData, condiciones: e.target.value})}
+                    className="w-full min-h-20 p-3 border border-gray-300 rounded-md"
+                    placeholder="Términos y condiciones de la factura..."
+                  />
+                </div>
+              </CardContent>
+            </Card>
+            
+            {/* Botones de acción */}
+            <div className="flex gap-3 pt-4 border-t">
+              <Button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700">
+                Crear Factura
+              </Button>
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setDialogOpen(false)}
+                className="flex-1"
+              >
+                Cancelar
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* Facturas Table */}
       <Card>
