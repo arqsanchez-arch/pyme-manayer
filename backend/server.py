@@ -665,9 +665,16 @@ async def update_pedido_estado(pedido_id: str, estado: str):
 # CRUD Endpoints for Facturas
 @api_router.post("/facturas", response_model=Factura)
 async def create_factura(factura: FacturaCreate):
-    # Get client name
+    # Get client information
     cliente = await db.clientes.find_one({"id": factura.cliente_id})
-    cliente_nombre = cliente["nombre"] if cliente else ""
+    if not cliente:
+        raise HTTPException(status_code=404, detail="Cliente not found")
+    
+    cliente_nombre = cliente["nombre"]
+    cliente_direccion = cliente.get("direccion", "")
+    cliente_email = cliente.get("email", "")
+    cliente_telefono = cliente.get("telefono", "")
+    cliente_cuit = cliente.get("cuit_dni", "")
     
     # Calculate totals
     subtotal = sum(item.subtotal for item in factura.items)
@@ -675,6 +682,10 @@ async def create_factura(factura: FacturaCreate):
     
     factura_dict = factura.dict()
     factura_dict["cliente_nombre"] = cliente_nombre
+    factura_dict["cliente_direccion"] = cliente_direccion
+    factura_dict["cliente_email"] = cliente_email
+    factura_dict["cliente_telefono"] = cliente_telefono
+    factura_dict["cliente_cuit"] = cliente_cuit
     factura_dict["subtotal"] = subtotal
     factura_dict["total"] = total
     factura_obj = Factura(**factura_dict)
