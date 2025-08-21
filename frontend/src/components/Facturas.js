@@ -574,8 +574,26 @@ const Facturas = ({ searchTerm }) => {
               <CardContent>
                 <div className="space-y-3">
                   {formData.items.map((item, index) => (
-                    <div key={index} className="grid grid-cols-12 gap-2 p-3 border rounded-lg">
-                      <div className="col-span-5">
+                    <div key={index} className="grid grid-cols-14 gap-2 p-3 border rounded-lg">
+                      <div className="col-span-4">
+                        <Label className="text-xs">Tipo de Producto *</Label>
+                        <Select 
+                          value={item.articulo_id} 
+                          onValueChange={(value) => handleItemChange(index, 'articulo_id', value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Seleccionar producto" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {articulos.filter(a => a.activo).map((articulo) => (
+                              <SelectItem key={articulo.id} value={articulo.id}>
+                                {articulo.codigo ? `${articulo.codigo} - ` : ''}{articulo.nombre} - ${articulo.precio}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="col-span-4">
                         <Label className="text-xs">Descripción *</Label>
                         <Input
                           placeholder="Descripción del producto/servicio"
@@ -607,7 +625,7 @@ const Facturas = ({ searchTerm }) => {
                           required
                         />
                       </div>
-                      <div className="col-span-2">
+                      <div className="col-span-1">
                         <Label className="text-xs">Subtotal</Label>
                         <Input
                           value={`$${item.subtotal.toFixed(2)}`}
