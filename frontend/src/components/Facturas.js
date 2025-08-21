@@ -108,6 +108,20 @@ const Facturas = ({ searchTerm }) => {
     const newItems = [...formData.items];
     newItems[index] = { ...newItems[index], [field]: value };
     
+    // Si se selecciona un artículo, autocompletar los datos
+    if (field === 'articulo_id' && value) {
+      const articulo = articulos.find(a => a.id === value);
+      if (articulo) {
+        newItems[index].descripcion = articulo.nombre;
+        newItems[index].precio_unitario = articulo.precio;
+        newItems[index].subtotal = calculateItemSubtotal(
+          newItems[index].cantidad,
+          articulo.precio
+        );
+      }
+    }
+    
+    // Recalcular subtotal si cambia cantidad o precio
     if (field === 'cantidad' || field === 'precio_unitario') {
       newItems[index].subtotal = calculateItemSubtotal(
         newItems[index].cantidad,
@@ -121,7 +135,7 @@ const Facturas = ({ searchTerm }) => {
   const addItem = () => {
     setFormData({
       ...formData,
-      items: [...formData.items, { descripcion: "", cantidad: 1, precio_unitario: 0, subtotal: 0 }]
+      items: [...formData.items, { articulo_id: "", descripcion: "", cantidad: 1, precio_unitario: 0, subtotal: 0 }]
     });
   };
 
