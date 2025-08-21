@@ -179,7 +179,7 @@ const Facturas = ({ searchTerm }) => {
         contacto_nombre: "",
         contacto_telefono: "",
         pedido_id: "",
-        items: [{ descripcion: "", cantidad: 1, precio_unitario: 0, subtotal: 0 }],
+        items: [{ articulo_id: "", descripcion: "", cantidad: 1, precio_unitario: 0, subtotal: 0 }],
         impuestos: 0,
         notas: "",
         condiciones: ""
