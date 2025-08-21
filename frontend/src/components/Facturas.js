@@ -661,15 +661,27 @@ const Facturas = ({ searchTerm }) => {
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="impuestos">Impuestos/IVA</Label>
+                      <Label htmlFor="porcentaje_iva">Porcentaje de IVA</Label>
+                      <Select 
+                        value={formData.porcentaje_iva} 
+                        onValueChange={(value) => setFormData({...formData, porcentaje_iva: value})}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="21">21% (General)</SelectItem>
+                          <SelectItem value="10.5">10.5% (Reducido)</SelectItem>
+                          <SelectItem value="0">0% (Exento)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label>IVA Calculado</Label>
                       <Input
-                        id="impuestos"
-                        type="number"
-                        value={formData.impuestos}
-                        onChange={(e) => setFormData({...formData, impuestos: e.target.value})}
-                        min="0"
-                        step="0.01"
-                        placeholder="0.00"
+                        value={`$${impuestosCalculados.toFixed(2)}`}
+                        readOnly
+                        className="bg-gray-50 font-medium"
                       />
                     </div>
                   </div>
@@ -680,8 +692,8 @@ const Facturas = ({ searchTerm }) => {
                       <span className="font-medium">${subtotal.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between items-center text-lg">
-                      <span>Impuestos:</span>
-                      <span className="font-medium">${parseFloat(formData.impuestos || 0).toFixed(2)}</span>
+                      <span>IVA ({formData.porcentaje_iva}%):</span>
+                      <span className="font-medium">${impuestosCalculados.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between items-center text-xl font-bold text-blue-700 mt-2 pt-2 border-t border-blue-200">
                       <span>TOTAL FACTURA:</span>
