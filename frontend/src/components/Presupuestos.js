@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { Plus, Edit, Eye, Send, Check, X } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, Printer, FileText, Mail, MessageCircle, Download, Send, Check, X } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
@@ -15,23 +15,47 @@ const API = `${BACKEND_URL}/api`;
 const Presupuestos = ({ searchTerm }) => {
   const [presupuestos, setPresupuestos] = useState([]);
   const [clientes, setClientes] = useState([]);
+  const [articulos, setArticulos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [viewingPresupuesto, setViewingPresupuesto] = useState(null);
+  
+  // Filtros específicos
+  const [filtros, setFiltros] = useState({
+    busqueda: "",
+    estado: "todos" // todos, borrador, enviado, aceptado, rechazado, convertido, vencido
+  });
+
   const [formData, setFormData] = useState({
+    // Datos del presupuesto
     numero_presupuesto: "",
-    cliente_id: "",
-    items: [{ descripcion: "", cantidad: 1, precio_unitario: 0, subtotal: 0 }],
-    impuestos: 0,
+    fecha_emision: new Date().toISOString().split('T')[0],
     fecha_vencimiento: "",
     validez_dias: 30,
-    notas: ""
+    
+    // Cliente
+    cliente_id: "",
+    condicion_iva: "Responsable Inscripto",
+    contacto_nombre: "",
+    contacto_telefono: "",
+    
+    // Items
+    items: [{ articulo_id: "", descripcion: "", cantidad: 1, precio_unitario: 0, subtotal: 0 }],
+    
+    // Totales
+    porcentaje_iva: "21",
+    impuestos: 0,
+    
+    // Notas y condiciones
+    notas: "",
+    condiciones: ""
   });
 
   useEffect(() => {
     fetchPresupuestos();
     fetchClientes();
+    fetchArticulos();
   }, []);
 
   const fetchPresupuestos = async () => {
@@ -54,14 +78,48 @@ const Presupuestos = ({ searchTerm }) => {
     }
   };
 
+  const fetchArticulos = async () => {
+    try {
+      const response = await axios.get(`${API}/articulos`);
+      setArticulos(response.data);
+    } catch (error) {
+      console.error("Error fetching articulos:", error);
+    }
+  };
+
   const calculateItemSubtotal = (cantidad, precio) => {
     return parseFloat(cantidad) * parseFloat(precio) || 0;
   };
+
+  // Función para calcular IVA automáticamente
+  const calculateIVA = (subtotal, porcentaje) => {
+    const porcentajeDecimal = parseFloat(porcentaje) / 100;
+    return subtotal * porcentajeDecimal;
+  };
+
+  // Calcular subtotal e IVA automáticamente
+  const subtotal = formData.items.reduce((sum, item) => sum + item.subtotal, 0);
+  const impuestosCalculados = calculateIVA(subtotal, formData.porcentaje_iva);
+  const total = subtotal + impuestosCalculados;
 
   const handleItemChange = (index, field, value) => {
     const newItems = [...formData.items];
     newItems[index] = { ...newItems[index], [field]: value };
     
+    // Si se selecciona un artículo, autocompletar los datos
+    if (field === 'articulo_id' && value) {
+      const articulo = articulos.find(a => a.id === value);
+      if (articulo) {
+        newItems[index].descripcion = articulo.nombre;
+        newItems[index].precio_unitario = articulo.precio;
+        newItems[index].subtotal = calculateItemSubtotal(
+          newItems[index].cantidad,
+          articulo.precio
+        );
+      }
+    }
+    
+    // Recalcular subtotal si cambia cantidad o precio
     if (field === 'cantidad' || field === 'precio_unitario') {
       newItems[index].subtotal = calculateItemSubtotal(
         newItems[index].cantidad,
@@ -75,7 +133,7 @@ const Presupuestos = ({ searchTerm }) => {
   const addItem = () => {
     setFormData({
       ...formData,
-      items: [...formData.items, { descripcion: "", cantidad: 1, precio_unitario: 0, subtotal: 0 }]
+      items: [...formData.items, { articulo_id: "", descripcion: "", cantidad: 1, precio_unitario: 0, subtotal: 0 }]
     });
   };
 
@@ -89,7 +147,10 @@ const Presupuestos = ({ searchTerm }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const presupuestoData = { ...formData };
+      const presupuestoData = { 
+        ...formData,
+        impuestos: impuestosCalculados
+      };
       if (!presupuestoData.numero_presupuesto) {
         presupuestoData.numero_presupuesto = `PRES-${Date.now()}`;
       }
@@ -99,12 +160,18 @@ const Presupuestos = ({ searchTerm }) => {
       setDialogOpen(false);
       setFormData({
         numero_presupuesto: "",
-        cliente_id: "",
-        items: [{ descripcion: "", cantidad: 1, precio_unitario: 0, subtotal: 0 }],
-        impuestos: 0,
+        fecha_emision: new Date().toISOString().split('T')[0],
         fecha_vencimiento: "",
         validez_dias: 30,
-        notas: ""
+        cliente_id: "",
+        condicion_iva: "Responsable Inscripto",
+        contacto_nombre: "",
+        contacto_telefono: "",
+        items: [{ articulo_id: "", descripcion: "", cantidad: 1, precio_unitario: 0, subtotal: 0 }],
+        porcentaje_iva: "21",
+        impuestos: 0,
+        notas: "",
+        condiciones: ""
       });
       fetchPresupuestos();
     } catch (error) {
@@ -123,6 +190,17 @@ const Presupuestos = ({ searchTerm }) => {
     }
   };
 
+  const deletePresupuesto = async (presupuestoId) => {
+    if (window.confirm("¿Está seguro de que desea eliminar este presupuesto?")) {
+      try {
+        await axios.delete(`${API}/presupuestos/${presupuestoId}`);
+        fetchPresupuestos();
+      } catch (error) {
+        console.error("Error deleting presupuesto:", error);
+      }
+    }
+  };
+
   const getEstadoBadge = (estado, fechaVencimiento) => {
     const now = new Date();
     const vencimiento = new Date(fechaVencimiento);
@@ -133,7 +211,7 @@ const Presupuestos = ({ searchTerm }) => {
       return <Badge variant="outline" className="bg-blue-50 text-blue-700">Aceptado</Badge>;
     } else if (estado === 'rechazado') {
       return <Badge variant="destructive">Rechazado</Badge>;
-    } else if (now > vencimiento && estado !== 'convertido') {
+    } else if (now > vencimiento && estado !== 'convertido' && estado !== 'aceptado') {
       return <Badge variant="destructive">Vencido</Badge>;
     } else if (estado === 'enviado') {
       return <Badge variant="secondary">Enviado</Badge>;
@@ -142,13 +220,84 @@ const Presupuestos = ({ searchTerm }) => {
     }
   };
 
-  const filteredPresupuestos = presupuestos.filter(presupuesto =>
-    presupuesto.numero_presupuesto.toLowerCase().includes(searchTerm?.toLowerCase() || "") ||
-    presupuesto.cliente_nombre.toLowerCase().includes(searchTerm?.toLowerCase() || "")
-  );
+  // Función para obtener el estado real del presupuesto
+  const getPresupuestoEstado = (presupuesto) => {
+    const now = new Date();
+    const vencimiento = new Date(presupuesto.fecha_vencimiento);
+    
+    if (presupuesto.estado === 'convertido') {
+      return 'convertido';
+    } else if (presupuesto.estado === 'aceptado') {
+      return 'aceptado';
+    } else if (presupuesto.estado === 'rechazado') {
+      return 'rechazado';
+    } else if (now > vencimiento && presupuesto.estado !== 'convertido' && presupuesto.estado !== 'aceptado') {
+      return 'vencido';
+    } else if (presupuesto.estado === 'enviado') {
+      return 'enviado';
+    } else {
+      return 'borrador';
+    }
+  };
 
-  const subtotal = formData.items.reduce((sum, item) => sum + item.subtotal, 0);
-  const total = subtotal + parseFloat(formData.impuestos || 0);
+  // Filtrado
+  const filteredPresupuestos = presupuestos.filter(presupuesto => {
+    const matchesSearch = !filtros.busqueda || 
+      presupuesto.numero_presupuesto?.toLowerCase().includes(filtros.busqueda.toLowerCase()) ||
+      presupuesto.cliente_nombre?.toLowerCase().includes(filtros.busqueda.toLowerCase());
+    
+    const presupuestoEstado = getPresupuestoEstado(presupuesto);
+    const matchesEstado = filtros.estado === 'todos' || presupuestoEstado === filtros.estado;
+    
+    const matchesParentSearch = !searchTerm || 
+      presupuesto.numero_presupuesto?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      presupuesto.cliente_nombre?.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    return matchesSearch && matchesEstado && matchesParentSearch;
+  });
+
+  const limpiarFiltros = () => {
+    setFiltros({
+      busqueda: "",
+      estado: "todos"
+    });
+  };
+
+  // Funciones para acciones
+  const handlePrint = (presupuesto) => {
+    console.log("Imprimir presupuesto:", presupuesto.numero_presupuesto);
+  };
+
+  const handleDownloadPDF = (presupuesto) => {
+    console.log("Descargar PDF:", presupuesto.numero_presupuesto);
+  };
+
+  const handleSendEmail = (presupuesto) => {
+    console.log("Enviar email:", presupuesto.numero_presupuesto);
+  };
+
+  const handleSendWhatsApp = (presupuesto) => {
+    console.log("Enviar WhatsApp:", presupuesto.numero_presupuesto);
+  };
+
+  const handleEdit = (presupuesto) => {
+    setFormData({
+      numero_presupuesto: presupuesto.numero_presupuesto,
+      fecha_emision: new Date(presupuesto.fecha_emision).toISOString().split('T')[0],
+      fecha_vencimiento: new Date(presupuesto.fecha_vencimiento).toISOString().split('T')[0],
+      validez_dias: presupuesto.validez_dias || 30,
+      cliente_id: presupuesto.cliente_id,
+      condicion_iva: presupuesto.condicion_iva || "Responsable Inscripto",
+      contacto_nombre: presupuesto.contacto_nombre || "",
+      contacto_telefono: presupuesto.contacto_telefono || "",
+      items: presupuesto.items,
+      porcentaje_iva: "21",
+      impuestos: presupuesto.impuestos,
+      notas: presupuesto.notas,
+      condiciones: presupuesto.condiciones || ""
+    });
+    setDialogOpen(true);
+  };
 
   if (loading) {
     return (
